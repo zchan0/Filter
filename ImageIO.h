@@ -17,6 +17,7 @@ class ImageIO {
     void loadImage(const std::string fileName);
     void exportImage(const std::string fileName);
     void drawImage();
+    void printImage();
 
     int getInWidth() const;
     int getInHeight() const;

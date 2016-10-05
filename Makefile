@@ -13,8 +13,8 @@ else
   endif
 endif
 
-HFILES  = ImageIO.${H}
-OBJS    = ImageIO.o
+HFILES  = ImageIO.${H} Kernel.${H}
+OBJS    = ImageIO.o Kernel.o
 PROJECT = filt
 
 ${PROJECT}:	${OBJS} ${PROJECT}.o
@@ -25,6 +25,9 @@ ${PROJECT}.o: ${PROJECT}.${C} ${HFILES}
 
 ImageIO.o: ImageIO.${C} ${HFILES}
 	${CC} ${CFLAGS} -c ImageIO.${C} 
+
+Kernel.o: Kernel.${C} ${HFILES}
+	${CC} ${CFLAGS} -c Kernel.${C} 
 
 clean:
 	rm -f core.* *.o *~ ${PROJECT}

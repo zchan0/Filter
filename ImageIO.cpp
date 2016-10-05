@@ -163,12 +163,18 @@ void ImageIO::drawImage() {
   glutSwapBuffers();
 }
 
+void ImageIO::printImage() {
+  for (int i = 0; i < width * height; ++i) {
+    std::cout << "r " << (double)inPixmap[i].r << " g " << (double)inPixmap[i].g << " b " << (double)inPixmap[i].b << std::endl;
+  }
+}
+
 /**
  *
  * This idea credits to Kairui Wang, thanks! *
  */
 void ImageIO::convertPixmapToUpperLeft(unsigned char* pixmap, int nchannels, int width, int height) {
-  for(size_t j = height - 1; j > (height +1) / 2 - 1; --j) {
+  for(size_t j = height - 1; j > (height + 1) / 2 - 1; --j) {
     for(size_t i = 0; i < width * nchannels; ++i) {
       std::swap(pixmap[j * width * nchannels + i], pixmap[(height - 1 - j) * width * nchannels + i]);
     }
