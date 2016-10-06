@@ -40,13 +40,19 @@ void ImageIO::loadImage(const std::string fileName) {
   width  = spec.width;
   height = spec.height;
   inPixmap = new RGBAPixel[width * height];
-  
+
   bool readSucceed;
   if (nchannels == RGB_NCHANNELS) {
     rgbInPixmap = new RGBPixel[width * height];
     readSucceed = inFile -> read_image(TypeDesc::UINT8, &rgbInPixmap[0]);
-  } else{
+  } else if (nchannels == GREY_NCHANNELS) {
+    greyPixmap = new unsigned char[width * height];
+    readSucceed = inFile -> read_image(TypeDesc::UINT8, greyPixmap);
+  } else if (nchannels == RGBA_NCHANNELS) {
     readSucceed = inFile -> read_image(TypeDesc::UINT8, &inPixmap[0]);
+  } else {
+    std::cout << "nchannels is " << nchannels << ", not supported" << std::endl;
+    return;
   }
 
   if(!readSucceed) {
@@ -58,6 +64,9 @@ void ImageIO::loadImage(const std::string fileName) {
   // for draw with GL_RGBA
   if (nchannels == RGB_NCHANNELS && rgbInPixmap != NULL) {
     convertRGBToRGBA(width, height);
+  }
+  if (nchannels == GREY_NCHANNELS && greyPixmap != NULL) {
+    convertGreyToRGBA(width, height);
   }
 
   // inverse pixmap before drawing, because of openGL lower-left coordinate
@@ -109,9 +118,13 @@ void ImageIO::exportImage(const std::string fileName) {
     // inverse pixmap before writing, because of openGL lower-left coordinate
     convertPixmapToUpperLeft(&rgbOutPixmap[0].r, nchannels, w, h);
     writeSucceed = outFile -> write_image(TypeDesc::UINT8, rgbOutPixmap);
-  } else { 
+  } else if (nchannels == RGBA_NCHANNELS) { 
     convertPixmapToUpperLeft(&outPixmap[0].r, nchannels, w, h);
     writeSucceed = outFile -> write_image(TypeDesc::UINT8, outPixmap);
+  } else if (nchannels == GREY_NCHANNELS) {
+    unsigned char* pixmap = new unsigned char[w * h];
+    convertRGBAToGrey(pixmap, w, h);
+    writeSucceed = outFile -> write_image(TypeDesc::UINT8, pixmap);
   }
 
   if (!writeSucceed) {
@@ -163,18 +176,12 @@ void ImageIO::drawImage() {
   glutSwapBuffers();
 }
 
-void ImageIO::printImage() {
-  for (int i = 0; i < width * height; ++i) {
-    std::cout << "r " << (double)inPixmap[i].r << " g " << (double)inPixmap[i].g << " b " << (double)inPixmap[i].b << std::endl;
-  }
-}
-
 /**
  *
  * This idea credits to Kairui Wang, thanks! *
  */
 void ImageIO::convertPixmapToUpperLeft(unsigned char* pixmap, int nchannels, int width, int height) {
-  for(size_t j = height - 1; j > (height + 1) / 2 - 1; --j) {
+  for(size_t j = height - 1; j > (height +1) / 2 - 1; --j) {
     for(size_t i = 0; i < width * nchannels; ++i) {
       std::swap(pixmap[j * width * nchannels + i], pixmap[(height - 1 - j) * width * nchannels + i]);
     }
@@ -195,6 +202,21 @@ void ImageIO::convertRGBAToRGB(int iw, int ih) {
     rgbOutPixmap[i].r = outPixmap[i].r;
     rgbOutPixmap[i].g = outPixmap[i].g;
     rgbOutPixmap[i].b = outPixmap[i].b;
+  }
+}
+
+void ImageIO::convertGreyToRGBA(int iw, int ih) {
+  for (size_t i = 0; i < iw * ih; ++i) {
+    inPixmap[i].r = greyPixmap[i];
+    inPixmap[i].g = greyPixmap[i];
+    inPixmap[i].b = greyPixmap[i];
+    inPixmap[i].a = 255;
+  }
+}
+
+void ImageIO::convertRGBAToGrey(unsigned char* greyPixmap, int iw, int ih) {
+  for (size_t i = 0; i < iw * ih; ++i) {
+    greyPixmap[i] = inPixmap[i].r;
   }
 }
 
