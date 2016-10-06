@@ -1,6 +1,6 @@
 #define RGB_NCHANNELS  3
 #define RGBA_NCHANNELS 4
-#define GREY_NCHANNELS 1
+#define GRAY_NCHANNELS 1
 
 typedef struct {
   unsigned char r, g, b, a;
@@ -28,7 +28,7 @@ class ImageIO {
   private:
     int width, height; // loaded image size, for draw image
     int nchannels;
-    unsigned char *greyPixmap;
+    unsigned char *grayPixmap;
     RGBAPixel *outPixmap;
     RGBPixel  *rgbInPixmap, *rgbOutPixmap;
 
@@ -36,8 +36,8 @@ class ImageIO {
     void buildMap();
     void convertRGBToRGBA(int iw, int ih);
     void convertRGBAToRGB(int iw, int ih);
-    void convertGreyToRGBA(int iw, int ih);
-    void convertRGBAToGrey(unsigned char* greyPixmap, int iw, int ih);
+    void convertGrayToRGBA(int iw, int ih);
+    void convertRGBAToGray(unsigned char* greyPixmap, int iw, int ih);
     void convertPixmapToUpperLeft(unsigned char* pixmap, int nchannels, int width, int height);
 };
 
