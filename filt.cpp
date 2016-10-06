@@ -21,27 +21,46 @@ static ImageIO ioOrigin = ImageIO();
 static ImageIO ioFilted = ImageIO();
 
 // Filt handles
+static double sigma, theta, period;
 static Kernel kernel = Kernel();
+static bool readKernelFile = true;
 
 bool parseCommandLine(int argc, char* argv[]) {
+  int indexOption = -1;
   switch (argc) {
   case 3: case 4:
+  	input  = argv[1];
+    filt   = argv[2];
+    output = argv[3] != NULL ? argv[3] : "output.png";
+    return true; break;
+  case 7: case 8:	
   	input = argv[1];
-    filt  = argv[2];
-    
-    if (argv[3] != NULL) {
-    	output = argv[3];
-    } else {
-    	output = "output.png";
-    }
+	filt  = argv[2];
+  	for (int i = 0; i < argc; ++i) {
+  		if (argv[i][0] == '-') {
+  			indexOption = i;
+  		}
+  	}
+  	// Designated output image name
+  	if (indexOption == 4) {
+  		output = argv[3];
+  	} else if (indexOption == 3) {
+  		output = "output.png";
+  	} else if (indexOption == -1) {
+  		std::cerr << "Usage: filt in.png filter.filt [out.png] -g theta sigma period" << std:: endl;
+  		return false;
+  	}
+	
+	readKernelFile = false;	
+	theta  = std::stod(argv[indexOption + 1]);
+	sigma  = std::stod(argv[indexOption + 2]);
+	period = std::stod(argv[indexOption + 3]);
 
-    return true;
-    break;
+	return true; break;
   default:
-    std::cerr << "Usage: filt in.png filter.filt [out.png]" << std:: endl;
+  	std::cerr << "Usage: filt in.png filter.filt [out.png] -g theta sigma period" << std:: endl;
     exit(1);
-  	return false;
-    break;
+  	return false; break;
   }
 }
 
@@ -51,7 +70,11 @@ void loadImage() {
 }
 
 void loadKernel() {
-	kernel.readKernelFile(filt);
+	if (readKernelFile) {
+		kernel.readKernelFile(filt);
+	} else {
+
+	}
 }
 
 unsigned char getColorValue(RGBAPixel pixel, int channel) {
