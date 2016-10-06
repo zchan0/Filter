@@ -85,6 +85,8 @@ void getPixel(int x, int y, int kx, int ky, int& row, int& col) {
 }
 
 void convolve() {
+	kernel.printKernel();
+	
 	int iw = ioFilted.getInWidth();
 	int ih = ioFilted.getInHeight();
 	int kw = kernel.getWidth();
