@@ -23,9 +23,9 @@ static ImageIO ioFilted = ImageIO();
 // Filt handles
 static Kernel kernel = Kernel();
 
-bool getFileNameFromCommandLine(int argc, char* argv[]) {
+bool parseCommandLine(int argc, char* argv[]) {
   switch (argc) {
-  case 3:
+  case 3: case 4:
   	input = argv[1];
     filt  = argv[2];
     
@@ -156,6 +156,7 @@ void handleReshape(int width, int height) {
 void handleKeyboard(unsigned char key, int x, int y) {
 	switch(key) {
 	case 'c': case 'C': convolve(); break;
+	case 'w': case 'W': ioFilted.exportImage(output); break;
     case 'q': case 'Q': case ESC: exit(0); break;
   }	
 }
@@ -164,7 +165,7 @@ int main(int argc, char* argv[]) {
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_SINGLE | GLUT_RGBA);
 
-  	if (getFileNameFromCommandLine(argc, argv)) {
+  	if (parseCommandLine(argc, argv)) {
 		loadImage();	
 		loadKernel();
 	}
