@@ -6,13 +6,14 @@
 #endif
 
 #include <iostream>
-#include <cmath>
 #include <fstream>
+#include <cmath>
 
 #include "ImageIO.h"
 #include "Kernel.h"
 
 // Special char
+static const double PI = 3.14159265;
 static const unsigned char ESC = 27;
 
 // ImageIO handles
@@ -25,6 +26,30 @@ static double sigma, theta, period;
 static Kernel kernel = Kernel();
 static bool readKernelFile = true;
 
+/**
+ * Gabor filter
+ */
+
+// Though defined sigma, theta, period as static variable, but use them as parameter for calculate gabor may be better for reuse
+double calGabor(int x, int y, double sigma, double theta, double period) {
+	double sigmaX =  x * cos(theta) + y * sin(theta);
+	double sigmaY = -x * sin(theta) + y * cos(theta);
+	return exp(- (sigmaX * sigmaX + sigmaY * sigmaY) / (2 * sigma * sigma)) * cos(2.0 * PI * sigmaX / period);
+}
+
+// Set kernel m and n to be 2 * sigma
+void setupGaborKernel() {
+	std::cout << "theta: " << theta << " sigma: " << sigma << " period: " << period << std::endl;
+
+	kernel.setSize(4 * sigma + 1, 4 * sigma + 1);
+	for (int i = 0; i < kernel.getHeight(); ++i) {
+		for (int j = 0; j < kernel.getWidth(); ++j) {
+			kernel.weights[i][j] = calGabor(j - 2 * sigma, i - 2 * sigma, sigma, theta, period);
+		}
+	}	
+	kernel.setScale(1);	
+}
+
 bool parseCommandLine(int argc, char* argv[]) {
   int indexOption = -1;
   switch (argc) {
@@ -36,7 +61,7 @@ bool parseCommandLine(int argc, char* argv[]) {
   case 7: case 8:	
   	input = argv[1];
 	filt  = argv[2];
-  	for (int i = 0; i < argc; ++i) {
+  	for (int i = 3; i < argc; ++i) {
   		if (argv[i][0] == '-') {
   			indexOption = i;
   		}
@@ -52,7 +77,7 @@ bool parseCommandLine(int argc, char* argv[]) {
   	}
 	
 	readKernelFile = false;	
-	theta  = std::stod(argv[indexOption + 1]);
+	theta  = std::stod(argv[indexOption + 1]) * PI / 180.0;
 	sigma  = std::stod(argv[indexOption + 2]);
 	period = std::stod(argv[indexOption + 3]);
 
@@ -73,7 +98,7 @@ void loadKernel() {
 	if (readKernelFile) {
 		kernel.readKernelFile(filt);
 	} else {
-
+		setupGaborKernel();
 	}
 }
 
