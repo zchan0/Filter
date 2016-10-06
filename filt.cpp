@@ -15,14 +15,6 @@
 // Special char
 static const unsigned char ESC = 27;
 
-// Window size
-static const int Width  = 640;
-static const int Height = 480;
-
-// Window handles 
-static int windowOrigin;
-static int windowFilted;
-
 // ImageIO handles
 static std::string input, output, filt;
 static ImageIO ioOrigin = ImageIO();
@@ -58,6 +50,10 @@ void loadImage() {
 	ioFilted.loadImage(input);
 }
 
+void loadKernel() {
+	kernel.readKernelFile(filt);
+}
+
 unsigned char getColorValue(RGBAPixel pixel, int channel) {
 	switch(channel) {
 		case 0: return pixel.r; break;
@@ -86,7 +82,7 @@ void getPixel(int x, int y, int kx, int ky, int& row, int& col) {
 
 void convolve() {
 	kernel.printKernel();
-	
+
 	int iw = ioFilted.getInWidth();
 	int ih = ioFilted.getInHeight();
 	int kw = kernel.getWidth();
@@ -170,17 +166,19 @@ int main(int argc, char* argv[]) {
 
   	if (getFileNameFromCommandLine(argc, argv)) {
 		loadImage();	
-		kernel.readKernelFile(filt);
+		loadKernel();
 	}
 
 	// Origin image window
-	windowOrigin = glutCreateWindow("Original Image");
+	glutInitWindowSize(ioOrigin.getInWidth(), ioOrigin.getInHeight());
+	glutCreateWindow("Original Image");
 	glutDisplayFunc(displayOriginWindow);
 	glutKeyboardFunc(handleKeyboard);
 	glutReshapeFunc(handleReshape);
 
 	// Filt image window
-	windowFilted = glutCreateWindow("Filted Image");
+	glutInitWindowSize(ioFilted.getInWidth(), ioFilted.getInHeight());
+	glutCreateWindow("Filted Image");
 	glutDisplayFunc(displayFiltedWindow);
 	glutKeyboardFunc(handleKeyboard);
 	glutReshapeFunc(handleReshape);

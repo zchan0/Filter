@@ -47,7 +47,7 @@ double Kernel::getWeights() const {
 			}
 		}
 	}
-	return std::max(possum, negsum);
+	return std::max(possum, std::fabs(negsum));
 }
 
 void Kernel::setScale(double s) {
@@ -117,7 +117,7 @@ void Kernel::readKernelFile(const std::string filename) {
 }
 
 void Kernel::printKernel() const {
-	std::cout << "size: " << width << " X "<< height << " scale: " << scale << std::endl;
+	std::cout << "size: " << width << " X "<< height << " scale: 1 / " << scale << std::endl;
 	for (int i = 0; i < height; ++i) {
 		for (int j = 0; j < width; ++j) {
 			std::cout << weights[i][j] << "\t";
