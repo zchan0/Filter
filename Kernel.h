@@ -9,7 +9,7 @@ public:
 	int getHeight() const;
 	double getScale() const;
 
-	void setScale(double s);
+	void setScale(double s = 0);
 	void setSize(int w, int h);
 	void readKernelFile(const std::string filenname);
 	void printKernel() const;
