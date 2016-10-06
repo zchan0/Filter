@@ -71,22 +71,6 @@ void Kernel::setSize(int w, int h) {
 }
 
 /**
- * split string by delimiter
- * credits to http://stackoverflow.com/a/236803
- * @param s     string to be splited
- * @param delim delimiter
- * @param elems splited values
- */
-void split(const std::string &s, char delim, std::vector<std::string> &elems) {
-    std::stringstream ss;
-    ss.str(s);
-    std::string item;
-    while (getline(ss, item, delim)) {
-        elems.push_back(item);
-    }
-}
-
-/**
  * setup kernel from file(filename)
  * file format must be
  * line 1: kernel-size scale-factor 
@@ -97,12 +81,16 @@ void split(const std::string &s, char delim, std::vector<std::string> &elems) {
  */
 void Kernel::readKernelFile(const std::string filename) {
 	std::ifstream file(filename);
-	std::string line;
+	std::string str;
 	std::vector<std::string> v;	
 
 	if (file.is_open()) {
-		while(getline(file, line)) {
-			split(line, ' ', v);
+		while(!file.eof()) {
+			str = " ";
+			file >> str;
+			if (str != " ") {
+				v.push_back(str);
+			}
 		}
 		file.close();
 	}
@@ -129,10 +117,10 @@ void Kernel::readKernelFile(const std::string filename) {
 }
 
 void Kernel::printKernel() const {
-	std::cout << "size: " << width << " scale: " << scale << std::endl;
+	std::cout << "size: " << width << " X "<< height << " scale: " << scale << std::endl;
 	for (int i = 0; i < height; ++i) {
 		for (int j = 0; j < width; ++j) {
-			std::cout << weights[i][j] << " ";
+			std::cout << weights[i][j] << "\t";
 		}
 		std::cout << std::endl;
 	}
