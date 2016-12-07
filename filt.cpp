@@ -60,7 +60,7 @@ bool parseCommandLine(int argc, char* argv[]) {
     return true; break;
   case 7: case 8:	
   	input = argv[1];
-	filt  = argv[2];
+		filt  = argv[2];
   	for (int i = 3; i < argc; ++i) {
   		if (argv[i][0] == '-') {
   			indexOption = i;
